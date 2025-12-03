@@ -25,7 +25,7 @@ export function Layout({
       {headerComponent || <Header title={headerTitle} action={headerAction} />}
       
       {/* Contenido principal */}
-      <main className="flex-1 pb-20 safe-top">
+      <main className="flex-1 nav-bottom-spacing safe-top">
         {children}
       </main>
       

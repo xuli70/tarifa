@@ -205,6 +205,11 @@
     padding-right: env(safe-area-inset-right);
   }
   
+  /* Bottom navigation spacing - accounts for nav height (64px) + safe area */
+  .nav-bottom-spacing {
+    padding-bottom: calc(4rem + env(safe-area-inset-bottom, 0px) + 1rem);
+  }
+
   /* Mobile-specific utilities */
   .mobile-scroll {
     -webkit-overflow-scrolling: touch;
