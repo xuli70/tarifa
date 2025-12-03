@@ -210,6 +210,16 @@
     padding-bottom: calc(4rem + env(safe-area-inset-bottom, 0px) + 1rem);
   }
 
+  /* Top header spacing - accounts for header height + safe area */
+  .nav-top-spacing {
+    padding-top: calc(3.5rem + env(safe-area-inset-top, 0px));
+  }
+
+  /* For taller headers like DateHeader in Dashboard */
+  .nav-top-spacing-lg {
+    padding-top: calc(7.5rem + env(safe-area-inset-top, 0px));
+  }
+
   /* Mobile-specific utilities */
   .mobile-scroll {
     -webkit-overflow-scrolling: touch;

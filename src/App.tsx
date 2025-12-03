@@ -74,11 +74,12 @@ function AppContent() {
   };
 
   return (
-    <Layout 
-      activeTab={activeTab} 
+    <Layout
+      activeTab={activeTab}
       onTabChange={setActiveTab}
       headerTitle={getHeaderTitle()}
       headerComponent={getHeaderComponent()}
+      largeHeader={activeTab === 'dashboard'}
     >
       {renderContent()}
     </Layout>

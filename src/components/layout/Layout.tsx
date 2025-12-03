@@ -9,15 +9,17 @@ interface LayoutProps {
   headerTitle?: string;
   headerAction?: ReactNode;
   headerComponent?: ReactNode;
+  largeHeader?: boolean;
 }
 
-export function Layout({ 
-  children, 
-  activeTab, 
-  onTabChange, 
+export function Layout({
+  children,
+  activeTab,
+  onTabChange,
   headerTitle,
   headerAction,
-  headerComponent 
+  headerComponent,
+  largeHeader = false
 }: LayoutProps) {
   return (
     <div className="min-h-screen bg-background-primary flex flex-col">
@@ -25,7 +27,7 @@ export function Layout({
       {headerComponent || <Header title={headerTitle} action={headerAction} />}
       
       {/* Contenido principal */}
-      <main className="flex-1 nav-bottom-spacing safe-top">
+      <main className={`flex-1 nav-bottom-spacing ${largeHeader ? 'nav-top-spacing-lg' : 'nav-top-spacing'}`}>
         {children}
       </main>
       
