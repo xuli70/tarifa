@@ -1,6 +1,9 @@
 # Build stage
 FROM node:20-alpine AS builder
 
+# Set CI environment for non-interactive pnpm
+ENV CI=true
+
 # Install pnpm
 RUN corepack enable && corepack prepare pnpm@latest --activate
 
