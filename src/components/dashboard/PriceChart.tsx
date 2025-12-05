@@ -104,7 +104,7 @@ export function PriceChart({ prices, onHourSelect }: PriceChartProps) {
       </div>
 
       {/* Contenedor del gráfico con franjas de fondo */}
-      <div className="relative h-64 mb-4 overflow-hidden rounded-lg">
+      <div className="relative h-64 mb-4 overflow-hidden rounded-lg px-1">
         {/* Fondos de franjas horarias */}
         <div className="absolute inset-0 flex rounded-lg overflow-hidden">
           {TIME_SLOTS.map((slot) => (
@@ -127,7 +127,7 @@ export function PriceChart({ prices, onHourSelect }: PriceChartProps) {
         </div>
 
         {/* Gráfico de barras */}
-        <div className="relative h-full flex items-end z-20">
+        <div className="relative h-full flex items-end z-20 gap-px sm:gap-0.5">
           {prices.map((price) => {
             const height = getBarHeight(price.price);
             const isCurrent = price.isCurrent;
@@ -137,7 +137,7 @@ export function PriceChart({ prices, onHourSelect }: PriceChartProps) {
             return (
               <div
                 key={price.hour}
-                className="relative flex flex-col items-center justify-end flex-1 h-full group cursor-pointer"
+                className="relative flex flex-col items-center justify-end flex-1 min-w-0 h-full group cursor-pointer"
                 onClick={() => onHourSelect(price)}
                 onMouseEnter={() => setHoveredPrice(price)}
                 onMouseLeave={() => setHoveredPrice(null)}
@@ -173,16 +173,16 @@ export function PriceChart({ prices, onHourSelect }: PriceChartProps) {
                 {/* Barra */}
                 <div
                   className={cn(
-                    'w-full rounded-t-md transition-all duration-200',
+                    'w-full rounded-t-sm sm:rounded-t-md transition-all duration-200',
                     'relative',
-                    isCurrent && 'ring-2 ring-primary-500 ring-offset-2 ring-offset-white',
-                    isHovered && 'brightness-110 scale-105'
+                    isCurrent && 'ring-1 sm:ring-2 ring-primary-500',
+                    isHovered && 'brightness-110'
                   )}
                   style={{
                     height: `${height}%`,
                     background: getBarGradient(price.price),
                     boxShadow: isHovered ? getBarShadow(price.price) : 'none',
-                    minHeight: '12px'
+                    minHeight: '8px'
                   }}
                 >
                   {/* Indicador de hora actual */}
@@ -193,13 +193,15 @@ export function PriceChart({ prices, onHourSelect }: PriceChartProps) {
                   )}
                 </div>
 
-                {/* Etiqueta de hora - cada 2 horas */}
+                {/* Etiqueta de hora - cada 6 horas en móvil, cada 2 en desktop */}
                 <span className={cn(
-                  'text-caption mt-1.5 font-medium transition-colors',
-                  price.hour % 2 === 0 ? 'text-neutral-500' : 'text-transparent',
+                  'text-[8px] sm:text-caption mt-0.5 sm:mt-1.5 font-medium transition-colors',
+                  // Móvil: solo 0, 6, 12, 18. Desktop: cada 2 horas
+                  price.hour % 6 === 0 ? 'text-neutral-500' : 'text-transparent',
+                  price.hour % 2 === 0 && 'sm:text-neutral-500',
                   'group-hover:text-neutral-700'
                 )}>
-                  {price.hour % 2 === 0 ? formatHour(price.hour) : ''}
+                  {price.hour}
                 </span>
               </div>
             );

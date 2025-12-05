@@ -58,8 +58,12 @@ The main price visualization component (`src/components/dashboard/PriceChart.tsx
 - **Current hour indicator**: Pulsing blue dot with ring highlight
 - **Hour labels**: Every 2 hours for better readability
 - **Touch support**: `onTouchStart`/`onTouchEnd` for mobile tooltip interaction
+- **Mobile optimized**: All 24 bars fit within container using `flex-1` distribution
 
-**Important CSS note**: Bar containers must have `h-full justify-end` for percentage heights to work correctly.
+**Important CSS notes**:
+- Bar containers must have `h-full justify-end` for percentage heights to work correctly
+- Chart container uses `overflow-hidden rounded-lg` to prevent bars from overflowing on mobile
+- Bars use `flex-1` without margins to maximize space efficiency on small screens
 
 ### Type Definitions
 All types are in `src/types/api.ts`: PricePoint, HourlyPriceData, Appliance, OptimizedSchedule, UserPreferences, AppState, plus helper functions (formatPrice, getPriceCategory, etc.)
@@ -116,6 +120,8 @@ docker run -p 80:80 tarifa
 The Dockerfile uses multi-stage build:
 1. **Builder stage**: Node 20 Alpine + pnpm, builds with `pnpm build:prod`
 2. **Production stage**: nginx:alpine serves static files from `/dist`
+
+**Note**: pnpm v10+ requires explicit approval for build scripts. The Dockerfile includes `pnpm config set onlyBuiltDependencies esbuild` to allow esbuild to run its post-install scripts.
 
 ### Coolify Deployment
 - **Project**: Tarifa (UUID: `f4s48www4g4wok080o8ogcs8`)
