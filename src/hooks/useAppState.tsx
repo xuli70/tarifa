@@ -210,7 +210,13 @@ export function AppProvider({ children }: AppProviderProps) {
   // Limpiar todos los electrodomésticos
   const clearAppliances = () => {
     dispatch({ type: 'CLEAR_APPLIANCES' });
-    localStorage.removeItem('app Appliances');
+    if (isLocalStorageAvailable()) {
+      try {
+        localStorage.removeItem(STORAGE_KEYS.APPLIANCES);
+      } catch {
+        // Silent fail
+      }
+    }
   };
 
   // Optimizar electrodomésticos
@@ -236,10 +242,16 @@ export function AppProvider({ children }: AppProviderProps) {
   // Actualizar preferencias
   const updatePreferences = (preferences: Partial<UserPreferences>) => {
     dispatch({ type: 'UPDATE_PREFERENCES', payload: preferences });
-    
-    // Guardar en localStorage
-    const updatedPreferences = { ...state.preferences, ...preferences };
-    localStorage.setItem('app Preferences', JSON.stringify(updatedPreferences));
+
+    // Guardar en localStorage (iOS Safari safe)
+    if (isLocalStorageAvailable()) {
+      try {
+        const updatedPreferences = { ...state.preferences, ...preferences };
+        localStorage.setItem(STORAGE_KEYS.PREFERENCES, JSON.stringify(updatedPreferences));
+      } catch {
+        // Silent fail for Safari private browsing
+      }
+    }
   };
 
   // Añadir alerta de precio
@@ -290,9 +302,11 @@ export function AppProvider({ children }: AppProviderProps) {
     loadPrices();
   }, []);
 
-  // Auto-refresh precios cada 5 minutos
+  // Auto-refresh precios cada 5 minutos (iOS battery optimization: skip when in background)
   useEffect(() => {
     const interval = setInterval(() => {
+      // iOS Safari: don't refresh when page is hidden (saves battery)
+      if (document.hidden) return;
       if (!state.loading && !state.error) {
         loadPrices(state.currentDate);
       }
@@ -339,21 +353,70 @@ export function useApp() {
 }
 
 // Funciones auxiliares para localStorage
+// iOS Safari private browsing compatibility: check if localStorage is available
+function isLocalStorageAvailable(): boolean {
+  try {
+    const testKey = '__storage_test__';
+    localStorage.setItem(testKey, testKey);
+    localStorage.removeItem(testKey);
+    return true;
+  } catch {
+    return false;
+  }
+}
+
+// Storage keys without spaces for better Safari compatibility
+const STORAGE_KEYS = {
+  APPLIANCES: 'tarifa_appliances',
+  PREFERENCES: 'tarifa_preferences',
+} as const;
+
+// Migration: move old keys to new keys (one-time migration)
+function migrateOldStorageKeys(): void {
+  if (!isLocalStorageAvailable()) return;
+
+  try {
+    // Migrate appliances
+    const oldAppliances = localStorage.getItem('app Appliances');
+    if (oldAppliances && !localStorage.getItem(STORAGE_KEYS.APPLIANCES)) {
+      localStorage.setItem(STORAGE_KEYS.APPLIANCES, oldAppliances);
+      localStorage.removeItem('app Appliances');
+    }
+
+    // Migrate preferences
+    const oldPreferences = localStorage.getItem('app Preferences');
+    if (oldPreferences && !localStorage.getItem(STORAGE_KEYS.PREFERENCES)) {
+      localStorage.setItem(STORAGE_KEYS.PREFERENCES, oldPreferences);
+      localStorage.removeItem('app Preferences');
+    }
+  } catch {
+    // Silent fail on migration
+  }
+}
+
+// Run migration on module load
+migrateOldStorageKeys();
+
 function generateId(): string {
   return Date.now().toString(36) + Math.random().toString(36).substr(2);
 }
 
 function saveAppliancesToStorage(appliances: Appliance[]): void {
+  if (!isLocalStorageAvailable()) return;
+
   try {
-    localStorage.setItem('app Appliances', JSON.stringify(appliances));
+    localStorage.setItem(STORAGE_KEYS.APPLIANCES, JSON.stringify(appliances));
   } catch (error) {
+    // iOS Safari: QuotaExceededError in private browsing
     console.error('Error saving appliances to localStorage:', error);
   }
 }
 
 function loadAppliancesFromStorage(): Appliance[] {
+  if (!isLocalStorageAvailable()) return [];
+
   try {
-    const stored = localStorage.getItem('app Appliances');
+    const stored = localStorage.getItem(STORAGE_KEYS.APPLIANCES);
     return stored ? JSON.parse(stored) : [];
   } catch (error) {
     console.error('Error loading appliances from localStorage:', error);
@@ -362,8 +425,10 @@ function loadAppliancesFromStorage(): Appliance[] {
 }
 
 function loadPreferencesFromStorage(): UserPreferences | null {
+  if (!isLocalStorageAvailable()) return null;
+
   try {
-    const stored = localStorage.getItem('app Preferences');
+    const stored = localStorage.getItem(STORAGE_KEYS.PREFERENCES);
     return stored ? JSON.parse(stored) : null;
   } catch (error) {
     console.error('Error loading preferences from localStorage:', error);
