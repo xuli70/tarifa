@@ -104,7 +104,7 @@ export function PriceChart({ prices, onHourSelect }: PriceChartProps) {
       </div>
 
       {/* Contenedor del gráfico con franjas de fondo */}
-      <div className="relative h-64 mb-4">
+      <div className="relative h-64 mb-4 overflow-hidden rounded-lg">
         {/* Fondos de franjas horarias */}
         <div className="absolute inset-0 flex rounded-lg overflow-hidden">
           {TIME_SLOTS.map((slot) => (
@@ -127,7 +127,7 @@ export function PriceChart({ prices, onHourSelect }: PriceChartProps) {
         </div>
 
         {/* Gráfico de barras */}
-        <div className="relative h-full flex items-end px-1 z-20">
+        <div className="relative h-full flex items-end z-20">
           {prices.map((price) => {
             const height = getBarHeight(price.price);
             const isCurrent = price.isCurrent;
@@ -174,7 +174,7 @@ export function PriceChart({ prices, onHourSelect }: PriceChartProps) {
                 <div
                   className={cn(
                     'w-full rounded-t-md transition-all duration-200',
-                    'relative mx-px',
+                    'relative',
                     isCurrent && 'ring-2 ring-primary-500 ring-offset-2 ring-offset-white',
                     isHovered && 'brightness-110 scale-105'
                   )}
