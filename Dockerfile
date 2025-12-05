@@ -12,6 +12,9 @@ WORKDIR /app
 # Copy package files
 COPY package.json pnpm-lock.yaml* ./
 
+# Allow esbuild to run its build scripts (required for pnpm v10+)
+RUN pnpm config set onlyBuiltDependencies esbuild
+
 # Install dependencies
 RUN pnpm install --frozen-lockfile --prefer-offline || pnpm install
 
