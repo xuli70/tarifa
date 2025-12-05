@@ -34,12 +34,19 @@ Note: All scripts auto-run `pnpm install --prefer-offline` first.
 ### Component Structure
 ```
 src/components/
+├── auth/         # PIN authentication (PinLanding)
 ├── dashboard/    # Price display & analytics (PriceChart, CurrentPriceCard, TopHoursCard)
 ├── planner/      # Appliance scheduling (ApplianceList, OptimizationTimeline, SavingsSummary)
 ├── settings/     # User preferences
 ├── layout/       # Layout, Header, TabNavigation
 └── ui/           # Base components (ErrorMessage, LoadingSpinner)
 ```
+
+### Authentication
+- **PIN Landing Page** (`src/components/auth/PinLanding.tsx`): 4-digit PIN required to access the app
+- **Auth Context** (`src/hooks/useAuth.tsx`): Manages authentication state with localStorage persistence
+- **Runtime Config** (`public/config.js`): PIN injected at Docker runtime via `docker-entrypoint.sh`
+- Default PIN: `1111` (configurable via `PIN_CODE` environment variable in Coolify)
 
 ### PriceChart Component Features
 The main price visualization component (`src/components/dashboard/PriceChart.tsx`) includes:
@@ -118,9 +125,13 @@ The Dockerfile uses multi-stage build:
 - **Port**: 80
 - **GitHub repo**: `https://github.com/xuli70/tarifa`
 
+**Environment Variables:**
+- `PIN_CODE` - 4-digit PIN for app access (default: `1111`)
+
 To deploy: Push to `main` branch, then trigger deploy in Coolify or enable auto-deploy.
 
 ### Key Deployment Files
-- `Dockerfile` - Multi-stage production build
+- `Dockerfile` - Multi-stage production build with entrypoint for env vars
+- `docker-entrypoint.sh` - Injects PIN_CODE into runtime config
 - `nginx.conf` - SPA routing, gzip, security headers, static asset caching
 - `.dockerignore` - Excludes node_modules, .git, etc.

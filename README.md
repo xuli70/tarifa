@@ -4,6 +4,7 @@ Aplicación web para optimizar el consumo eléctrico en España. Muestra los pre
 
 ## Características
 
+- **Acceso protegido**: PIN de 4 dígitos configurable para controlar el acceso
 - **Precios en tiempo real**: Obtiene precios horarios de la API oficial de REE
 - **Gráfico interactivo de precios**: Barras con degradados, alturas proporcionales, franjas horarias (madrugada, mañana, tarde, noche), tooltips y línea de media
 - **Clasificación de precios**: Barato (verde), Normal (ámbar), Caro (rojo)
@@ -52,21 +53,32 @@ pnpm clean        # Limpiar node_modules y cache
 # Construir imagen
 docker build -t tarifa .
 
-# Ejecutar contenedor
+# Ejecutar contenedor (PIN por defecto: 1111)
 docker run -p 80:80 tarifa
+
+# Ejecutar con PIN personalizado
+docker run -p 80:80 -e PIN_CODE=2580 tarifa
 ```
+
+## Variables de Entorno
+
+| Variable | Descripción | Default |
+|----------|-------------|---------|
+| `PIN_CODE` | PIN de 4 dígitos para acceder a la app | `1111` |
 
 ## Estructura del Proyecto
 
 ```
 src/
 ├── components/
+│   ├── auth/         # Autenticación PIN (PinLanding)
 │   ├── dashboard/    # Visualización de precios (PriceChart, CurrentPriceCard, TopHoursCard)
 │   ├── planner/      # Planificador de electrodomésticos
 │   ├── settings/     # Configuración de usuario
 │   ├── layout/       # Layout y navegación
 │   └── ui/           # Componentes base
-├── hooks/            # Custom hooks (useAppState)
+├── config/           # Configuración de la app (appConfig)
+├── hooks/            # Custom hooks (useAppState, useAuth)
 ├── services/         # Servicios API (reeApi, optimizationService)
 ├── types/            # Definiciones TypeScript
 └── lib/              # Utilidades
