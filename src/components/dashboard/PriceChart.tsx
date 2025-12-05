@@ -84,136 +84,126 @@ export function PriceChart({ prices, onHourSelect }: PriceChartProps) {
           Precios por horas
         </h2>
         <p className="text-body-sm text-neutral-500">
-          Desliza horizontalmente para ver todas las horas
+          Toca una barra para ver detalles
         </p>
       </div>
 
-      {/* Contenedor scrolleable para etiquetas y gráfico */}
-      <div className="relative mb-4">
-        {/* Indicador de scroll (gradiente derecho) */}
-        <div className="absolute right-0 top-0 bottom-0 w-6 bg-gradient-to-l from-white to-transparent pointer-events-none z-30 rounded-r-lg" />
+      {/* Etiquetas de franjas horarias */}
+      <div className="flex mb-2">
+        {TIME_SLOTS.map((slot) => (
+          <div
+            key={slot.name}
+            className="flex-1 text-center"
+            style={{ width: `${(slot.end - slot.start) / 24 * 100}%` }}
+          >
+            <span className="text-caption font-medium text-neutral-400 uppercase tracking-wide">
+              {slot.name}
+            </span>
+          </div>
+        ))}
+      </div>
 
-        <div className="overflow-x-auto mobile-scroll pb-2">
-          <div className="min-w-[600px]">
-            {/* Etiquetas de franjas horarias */}
-            <div className="flex mb-2">
-              {TIME_SLOTS.map((slot) => (
-                <div
-                  key={slot.name}
-                  className="flex-1 text-center"
-                  style={{ width: `${(slot.end - slot.start) / 24 * 100}%` }}
-                >
-                  <span className="text-caption font-medium text-neutral-400 uppercase tracking-wide">
-                    {slot.name}
-                  </span>
-                </div>
-              ))}
-            </div>
+      {/* Contenedor del gráfico con franjas de fondo */}
+      <div className="relative h-64 mb-4">
+        {/* Fondos de franjas horarias */}
+        <div className="absolute inset-0 flex rounded-lg overflow-hidden">
+          {TIME_SLOTS.map((slot) => (
+            <div
+              key={slot.name}
+              className={cn(slot.bgClass, 'transition-colors')}
+              style={{ width: `${(slot.end - slot.start) / 24 * 100}%` }}
+            />
+          ))}
+        </div>
 
-            {/* Contenedor del gráfico con franjas de fondo */}
-            <div className="relative h-64">
-              {/* Fondos de franjas horarias */}
-              <div className="absolute inset-0 flex rounded-lg overflow-hidden">
-                {TIME_SLOTS.map((slot) => (
-                  <div
-                    key={slot.name}
-                    className={cn(slot.bgClass, 'transition-colors')}
-                    style={{ width: `${(slot.end - slot.start) / 24 * 100}%` }}
-                  />
-                ))}
-              </div>
+        {/* Línea de media */}
+        <div
+          className="absolute left-0 right-0 border-t-2 border-dashed border-neutral-300 z-10 pointer-events-none"
+          style={{ bottom: `${averageLinePosition}%` }}
+        >
+          <span className="absolute right-0 -top-5 text-caption text-neutral-500 bg-white/80 px-1.5 py-0.5 rounded">
+            Media: {formatPrice(stats.average)}€
+          </span>
+        </div>
 
-              {/* Línea de media */}
+        {/* Gráfico de barras */}
+        <div className="relative h-full flex items-end px-1 z-20">
+          {prices.map((price) => {
+            const height = getBarHeight(price.price);
+            const isCurrent = price.isCurrent;
+            const isHovered = hoveredPrice?.hour === price.hour;
+            const category = getPriceCategory(price.price, stats);
+
+            return (
               <div
-                className="absolute left-0 right-0 border-t-2 border-dashed border-neutral-300 z-10 pointer-events-none"
-                style={{ bottom: `${averageLinePosition}%` }}
+                key={price.hour}
+                className="relative flex flex-col items-center justify-end flex-1 h-full group cursor-pointer"
+                onClick={() => onHourSelect(price)}
+                onMouseEnter={() => setHoveredPrice(price)}
+                onMouseLeave={() => setHoveredPrice(null)}
+                onTouchStart={() => setHoveredPrice(price)}
+                onTouchEnd={() => setHoveredPrice(null)}
               >
-                <span className="absolute right-0 -top-5 text-caption text-neutral-500 bg-white/80 px-1.5 py-0.5 rounded">
-                  Media: {formatPrice(stats.average)}€
+                {/* Tooltip */}
+                {isHovered && (
+                  <div className="absolute -top-20 left-1/2 transform -translate-x-1/2 z-30 animate-fade-in">
+                    <div className="bg-neutral-900 text-white px-3 py-2 rounded-lg shadow-lg text-center whitespace-nowrap">
+                      <p className="text-caption font-medium">
+                        {formatHour(price.hour)} - {formatHour(price.hour + 1)}
+                      </p>
+                      <p className="text-body font-bold">
+                        {formatPrice(price.price)}€/kWh
+                      </p>
+                      <p className={cn(
+                        'text-caption font-medium',
+                        category.type === 'cheap' && 'text-green-400',
+                        category.type === 'normal' && 'text-amber-400',
+                        category.type === 'expensive' && 'text-red-400'
+                      )}>
+                        {category.label}
+                      </p>
+                    </div>
+                    {/* Flecha del tooltip */}
+                    <div className="absolute left-1/2 transform -translate-x-1/2 -bottom-1.5">
+                      <div className="w-3 h-3 bg-neutral-900 transform rotate-45" />
+                    </div>
+                  </div>
+                )}
+
+                {/* Barra */}
+                <div
+                  className={cn(
+                    'w-full rounded-t-md transition-all duration-200',
+                    'relative mx-px',
+                    isCurrent && 'ring-2 ring-primary-500 ring-offset-2 ring-offset-white',
+                    isHovered && 'brightness-110 scale-105'
+                  )}
+                  style={{
+                    height: `${height}%`,
+                    background: getBarGradient(price.price),
+                    boxShadow: isHovered ? getBarShadow(price.price) : 'none',
+                    minHeight: '12px'
+                  }}
+                >
+                  {/* Indicador de hora actual */}
+                  {isCurrent && (
+                    <div className="absolute -top-4 left-1/2 transform -translate-x-1/2">
+                      <div className="w-2.5 h-2.5 bg-primary-500 rounded-full shadow-md animate-pulse" />
+                    </div>
+                  )}
+                </div>
+
+                {/* Etiqueta de hora - cada 2 horas */}
+                <span className={cn(
+                  'text-caption mt-1.5 font-medium transition-colors',
+                  price.hour % 2 === 0 ? 'text-neutral-500' : 'text-transparent',
+                  'group-hover:text-neutral-700'
+                )}>
+                  {price.hour % 2 === 0 ? formatHour(price.hour) : ''}
                 </span>
               </div>
-
-              {/* Gráfico de barras */}
-              <div className="relative h-full flex items-end px-1 z-20">
-                {prices.map((price) => {
-                  const height = getBarHeight(price.price);
-                  const isCurrent = price.isCurrent;
-                  const isHovered = hoveredPrice?.hour === price.hour;
-                  const category = getPriceCategory(price.price, stats);
-
-                  return (
-                    <div
-                      key={price.hour}
-                      className="relative flex flex-col items-center justify-end flex-1 h-full group cursor-pointer"
-                      onClick={() => onHourSelect(price)}
-                      onMouseEnter={() => setHoveredPrice(price)}
-                      onMouseLeave={() => setHoveredPrice(null)}
-                      onTouchStart={() => setHoveredPrice(price)}
-                      onTouchEnd={() => setHoveredPrice(null)}
-                    >
-                      {/* Tooltip */}
-                      {isHovered && (
-                        <div className="absolute -top-20 left-1/2 transform -translate-x-1/2 z-30 animate-fade-in">
-                          <div className="bg-neutral-900 text-white px-3 py-2 rounded-lg shadow-lg text-center whitespace-nowrap">
-                            <p className="text-caption font-medium">
-                              {formatHour(price.hour)} - {formatHour(price.hour + 1)}
-                            </p>
-                            <p className="text-body font-bold">
-                              {formatPrice(price.price)}€/kWh
-                            </p>
-                            <p className={cn(
-                              'text-caption font-medium',
-                              category.type === 'cheap' && 'text-green-400',
-                              category.type === 'normal' && 'text-amber-400',
-                              category.type === 'expensive' && 'text-red-400'
-                            )}>
-                              {category.label}
-                            </p>
-                          </div>
-                          {/* Flecha del tooltip */}
-                          <div className="absolute left-1/2 transform -translate-x-1/2 -bottom-1.5">
-                            <div className="w-3 h-3 bg-neutral-900 transform rotate-45" />
-                          </div>
-                        </div>
-                      )}
-
-                      {/* Barra */}
-                      <div
-                        className={cn(
-                          'w-full rounded-t-md transition-all duration-200',
-                          'relative mx-px',
-                          isCurrent && 'ring-2 ring-primary-500 ring-offset-2 ring-offset-white',
-                          isHovered && 'brightness-110 scale-105'
-                        )}
-                        style={{
-                          height: `${height}%`,
-                          background: getBarGradient(price.price),
-                          boxShadow: isHovered ? getBarShadow(price.price) : 'none',
-                          minHeight: '12px'
-                        }}
-                      >
-                        {/* Indicador de hora actual */}
-                        {isCurrent && (
-                          <div className="absolute -top-4 left-1/2 transform -translate-x-1/2">
-                            <div className="w-2.5 h-2.5 bg-primary-500 rounded-full shadow-md animate-pulse" />
-                          </div>
-                        )}
-                      </div>
-
-                      {/* Etiqueta de hora - cada 2 horas */}
-                      <span className={cn(
-                        'text-caption mt-1.5 font-medium transition-colors',
-                        price.hour % 2 === 0 ? 'text-neutral-500' : 'text-transparent',
-                        'group-hover:text-neutral-700'
-                      )}>
-                        {price.hour % 2 === 0 ? formatHour(price.hour) : ''}
-                      </span>
-                    </div>
-                  );
-                })}
-              </div>
-            </div>
-          </div>
+            );
+          })}
         </div>
       </div>
 
