@@ -43,41 +43,70 @@ class REEApiService {
         time_trunc: 'hour',
       });
 
-      const response = await fetch(`${url}?${params.toString()}`, {
-        method: 'GET',
-        headers: {
-          'Accept': 'application/json',
-          'User-Agent': 'PreciosElectricidad-Espana/1.0',
-        },
-      });
+      // iOS Safari compatibility:
+      // - Don't set User-Agent (Safari blocks custom User-Agent in fetch)
+      // - Use explicit mode: 'cors' for cross-origin requests
+      // - Add AbortController for timeout handling (Safari may hang on slow connections)
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 30000); // 30s timeout
 
-      if (!response.ok) {
-        throw new Error(`API Error: ${response.status} ${response.statusText}`);
+      try {
+        const response = await fetch(`${url}?${params.toString()}`, {
+          method: 'GET',
+          mode: 'cors',
+          credentials: 'omit', // Don't send cookies to avoid CORS issues
+          headers: {
+            'Accept': 'application/json',
+          },
+          signal: controller.signal,
+        });
+
+        clearTimeout(timeoutId);
+
+        if (!response.ok) {
+          throw new Error(`API Error: ${response.status} ${response.statusText}`);
+        }
+
+        const data: REEApiResponse = await response.json();
+
+        // Procesar respuesta
+        const hourlyData = this.processApiResponse(data, date);
+
+        // Guardar en caché
+        this.cache.set(dateKey, {
+          data: hourlyData,
+          timestamp: Date.now(),
+        });
+
+        return hourlyData;
+
+      } catch (fetchError) {
+        clearTimeout(timeoutId);
+
+        // iOS Safari: AbortError means timeout
+        if (fetchError instanceof Error && fetchError.name === 'AbortError') {
+          throw new Error('La conexión tardó demasiado. Por favor, verifica tu conexión a internet.');
+        }
+
+        // iOS Safari: "Load failed" or "Failed to fetch" are network errors
+        const errorMessage = fetchError instanceof Error ? fetchError.message : 'Error desconocido';
+        if (errorMessage.includes('Load failed') || errorMessage.includes('Failed to fetch')) {
+          throw new Error('Error de conexión. Verifica tu conexión a internet e inténtalo de nuevo.');
+        }
+
+        throw fetchError;
       }
-
-      const data: REEApiResponse = await response.json();
-      
-      // Procesar respuesta
-      const hourlyData = this.processApiResponse(data, date);
-      
-      // Guardar en caché
-      this.cache.set(dateKey, {
-        data: hourlyData,
-        timestamp: Date.now(),
-      });
-
-      return hourlyData;
 
     } catch (error) {
       console.error('Error fetching prices from REE API:', error);
-      
+
       // Si hay error, intentar usar datos de caché (aunque estén expirados)
       const expired = this.cache.get(dateKey);
       if (expired) {
         console.warn('Using expired cache data due to API error');
         return expired.data;
       }
-      
+
       throw new Error(`No se pudieron obtener los precios: ${error instanceof Error ? error.message : 'Error desconocido'}`);
     }
   }
