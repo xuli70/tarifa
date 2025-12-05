@@ -6,12 +6,20 @@ import { Planner } from './components/planner/Planner';
 import { Settings } from './components/settings/Settings';
 import { DateHeader } from './components/layout/Header';
 import { useApp } from './hooks/useAppState';
+import { useAuth } from './hooks/useAuth';
+import { PinLanding } from './components/auth/PinLanding';
 import './index.css';
 
 // Componente interno que usa el contexto
 function AppContent() {
+  const { isAuthenticated } = useAuth();
   const [activeTab, setActiveTab] = useState('dashboard');
   const { state, actions } = useApp();
+
+  // Si no esta autenticado, mostrar landing de PIN
+  if (!isAuthenticated) {
+    return <PinLanding />;
+  }
 
   const renderContent = () => {
     switch (activeTab) {

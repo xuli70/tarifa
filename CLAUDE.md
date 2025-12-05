@@ -41,6 +41,19 @@ src/components/
 └── ui/           # Base components (ErrorMessage, LoadingSpinner)
 ```
 
+### PriceChart Component Features
+The main price visualization component (`src/components/dashboard/PriceChart.tsx`) includes:
+- **Gradient bars**: 3-color gradients (dark → medium → light) for each price category
+- **Proportional bar heights**: Base height 30% + 70% range for visual balance (min=30%, max=100%)
+- **Time slot segmentation**: Visual division into 4 periods (Madrugada 00-06h, Mañana 06-12h, Tarde 12-18h, Noche 18-24h)
+- **Interactive tooltips**: Shows hour range, exact price (€/kWh), and category on hover/touch
+- **Average line**: Dashed horizontal line showing daily average price, centered in chart
+- **Current hour indicator**: Pulsing blue dot with ring highlight
+- **Hour labels**: Every 2 hours for better readability
+- **Touch support**: `onTouchStart`/`onTouchEnd` for mobile tooltip interaction
+
+**Important CSS note**: Bar containers must have `h-full justify-end` for percentage heights to work correctly.
+
 ### Type Definitions
 All types are in `src/types/api.ts`: PricePoint, HourlyPriceData, Appliance, OptimizedSchedule, UserPreferences, AppState, plus helper functions (formatPrice, getPriceCategory, etc.)
 
@@ -52,6 +65,30 @@ All types are in `src/types/api.ts`: PricePoint, HourlyPriceData, Appliance, Opt
 - **Forms**: React Hook Form + Zod validation
 - **Charts**: Recharts for interactive price visualization
 - **REE API**: `https://apidatos.ree.es/es/datos/mercados/precios-mercados-tiempo-real` (no auth required)
+
+## iOS Safari Compatibility
+
+The app includes specific fixes for iOS Safari:
+
+### API Fetch (`src/services/reeApi.ts`)
+- No custom `User-Agent` header (Safari blocks it in fetch requests)
+- Explicit `mode: 'cors'` and `credentials: 'omit'` for cross-origin requests
+- AbortController with 30s timeout (Safari may hang on slow connections)
+- Specific error handling for iOS "Load failed" and "Failed to fetch" errors
+
+### localStorage (`src/hooks/useAppState.tsx`)
+- `isLocalStorageAvailable()` check before usage
+- Silent fail for Safari private browsing mode
+- Handles `QuotaExceededError` gracefully
+
+### CSS/Viewport (`src/index.css`, `index.html`)
+- `viewport-fit=cover` for notch/dynamic island support
+- `-webkit-` prefixes for backdrop-filter, overflow-scrolling
+- `100dvh` dynamic viewport height with fallback
+- Safe area insets with `env()` functions
+
+### Build Target (`vite.config.ts`)
+- Targets `safari12`, `ios12` for broader compatibility
 
 ## Data Flow
 
