@@ -137,7 +137,7 @@ export function PriceChart({ prices, onHourSelect }: PriceChartProps) {
             return (
               <div
                 key={price.hour}
-                className="relative flex flex-col items-center flex-1 group cursor-pointer"
+                className="relative flex flex-col items-center justify-end flex-1 h-full group cursor-pointer"
                 onClick={() => onHourSelect(price)}
                 onMouseEnter={() => setHoveredPrice(price)}
                 onMouseLeave={() => setHoveredPrice(null)}
