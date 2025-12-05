@@ -22,7 +22,7 @@ export function Layout({
   largeHeader = false
 }: LayoutProps) {
   return (
-    <div className="min-h-screen bg-background-primary flex flex-col">
+    <div className="min-h-screen-safe bg-background-primary flex flex-col">
       {/* Header fijo */}
       {headerComponent || <Header title={headerTitle} action={headerAction} />}
       

@@ -60,3 +60,30 @@ All types are in `src/types/api.ts`: PricePoint, HourlyPriceData, Appliance, Opt
 3. User adds appliances with duration, priority, and time restrictions
 4. OptimizationService finds cheapest consecutive hour blocks respecting constraints
 5. Results displayed in timeline with cost savings calculation
+
+## Deployment
+
+### Docker (Production)
+```bash
+docker build -t tarifa .
+docker run -p 80:80 tarifa
+```
+
+The Dockerfile uses multi-stage build:
+1. **Builder stage**: Node 20 Alpine + pnpm, builds with `pnpm build:prod`
+2. **Production stage**: nginx:alpine serves static files from `/dist`
+
+### Coolify Deployment
+- **Project**: Tarifa (UUID: `f4s48www4g4wok080o8ogcs8`)
+- **Application**: tarifa-app (UUID: `r0wckso8s0sswswwkw08g84s`)
+- **Domain**: `https://tarifa.axcsol.com`
+- **Build pack**: Dockerfile
+- **Port**: 80
+- **GitHub repo**: `https://github.com/xuli70/tarifa`
+
+To deploy: Push to `main` branch, then trigger deploy in Coolify or enable auto-deploy.
+
+### Key Deployment Files
+- `Dockerfile` - Multi-stage production build
+- `nginx.conf` - SPA routing, gzip, security headers, static asset caching
+- `.dockerignore` - Excludes node_modules, .git, etc.

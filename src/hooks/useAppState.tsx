@@ -398,7 +398,7 @@ function migrateOldStorageKeys(): void {
 migrateOldStorageKeys();
 
 function generateId(): string {
-  return Date.now().toString(36) + Math.random().toString(36).substr(2);
+  return Date.now().toString(36) + Math.random().toString(36).substring(2);
 }
 
 function saveAppliancesToStorage(appliances: Appliance[]): void {

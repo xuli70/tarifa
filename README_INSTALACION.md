@@ -46,8 +46,44 @@ Aplicación web para consultar y optimizar el precio de la electricidad en Espa�
 |---------|-------------|
 | `pnpm dev` | Ejecutar en modo desarrollo (hot reload) |
 | `pnpm build` | Construir para producción |
+| `pnpm build:prod` | Build producción (sin source-identifier) |
 | `pnpm preview` | Previsualizar la build de producción |
 | `pnpm lint` | Verificar código con ESLint |
+| `pnpm clean` | Limpiar node_modules, cache y locks |
+
+## 🐳 Deployment con Docker
+
+### Build y ejecución local
+```bash
+docker build -t tarifa .
+docker run -p 80:80 tarifa
+```
+
+### Deployment en Coolify (VPS Hostinger)
+
+La aplicación está configurada para desplegarse en Coolify:
+
+1. **Sube el código a GitHub:**
+   ```bash
+   git init
+   git add .
+   git commit -m "Initial commit"
+   git remote add origin https://github.com/xuli70/tarifa.git
+   git branch -M main
+   git push -u origin main
+   ```
+
+2. **En Coolify**, la aplicación ya está configurada:
+   - **Proyecto**: Tarifa
+   - **Dominio**: `https://tarifa.axcsol.com`
+   - **Build pack**: Dockerfile
+
+3. **Despliega** desde el panel de Coolify o habilita auto-deploy
+
+### Archivos de configuración Docker
+- `Dockerfile` - Build multi-stage (Node 20 → nginx:alpine)
+- `nginx.conf` - Configuración SPA con gzip y headers de seguridad
+- `.dockerignore` - Excluye archivos innecesarios del build
 
 ## 📱 Funcionalidades
 
@@ -151,5 +187,11 @@ La aplicación está completamente desarrollada y lista para usar. Sigue las ins
 
 ---
 
-**Aplicación desarrollada por MiniMax Agent**
+**Aplicación desarrollada con asistencia de IA**
 *Fecha: Diciembre 2025*
+
+---
+
+## 🌐 Producción
+
+**URL**: https://tarifa.axcsol.com
