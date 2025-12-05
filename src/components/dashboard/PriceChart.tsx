@@ -52,14 +52,20 @@ export function PriceChart({ prices, onHourSelect }: PriceChartProps) {
     }
   };
 
+  // Constantes para el cálculo de alturas
+  const BASE_HEIGHT = 30; // Altura mínima de las barras (30%)
+  const RANGE = 70; // Rango de variación (70%)
+
   // Calcular altura relativa para cada barra
   const getBarHeight = (price: number) => {
     const normalized = (price - stats.min) / (stats.max - stats.min);
-    return Math.max(normalized * 100, 8); // Mínimo 8% de altura
+    // Altura base de 30%, rango de 70% para variación
+    return BASE_HEIGHT + (normalized * RANGE);
   };
 
-  // Calcular posición de la línea de media
-  const averageLinePosition = ((stats.average - stats.min) / (stats.max - stats.min)) * 100;
+  // Calcular posición de la línea de media (usando la misma escala)
+  const normalizedAverage = (stats.average - stats.min) / (stats.max - stats.min);
+  const averageLinePosition = BASE_HEIGHT + (normalizedAverage * RANGE);
 
   const formatHour = (hour: number) => {
     return hour.toString().padStart(2, '0') + ':00';
