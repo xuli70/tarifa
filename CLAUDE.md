@@ -53,10 +53,10 @@ The main price visualization component (`src/components/dashboard/PriceChart.tsx
 - **Gradient bars**: 3-color gradients (dark → medium → light) for each price category
 - **Proportional bar heights**: Base height 30% + 70% range for visual balance (min=30%, max=100%)
 - **Time slot segmentation**: Visual division into 4 periods (Madrugada 00-06h, Mañana 06-12h, Tarde 12-18h, Noche 18-24h)
-- **Interactive tooltips**: Shows hour range, exact price (€/kWh), and category on hover/touch
+- **Interactive tooltips**: Shows hour range, exact price (€/kWh), and category on hover/touch. Positioned below bars to avoid being cut off on mobile
 - **Average line**: Dashed horizontal line showing daily average price, centered in chart
 - **Current hour indicator**: Pulsing blue dot with ring highlight
-- **Hour labels**: Every 6 hours on mobile (0, 6, 12, 18), every 2 hours on desktop
+- **Hour labels**: Every 3 hours on mobile (0, 3, 6, 9, 12, 15, 18, 21) in bold, every 2 hours on desktop
 - **Touch support**: `onTouchStart`/`onTouchEnd` for mobile tooltip interaction
 - **Mobile optimized**: All 24 bars fit within container in portrait mode
 
@@ -64,8 +64,9 @@ The main price visualization component (`src/components/dashboard/PriceChart.tsx
 - Bar containers use `flex-1 min-w-0` to allow compression without minimum width constraints
 - Chart container uses `overflow-hidden rounded-lg px-1` for internal padding and overflow prevention
 - Bars use `gap-px sm:gap-0.5` for minimal spacing (1px mobile, 2px desktop)
-- Mobile-specific styles: `rounded-t-sm`, `ring-1`, `text-[8px]` for smaller visual elements
+- Mobile-specific styles: `rounded-t-sm`, `ring-1`, `text-[10px]`, `font-bold` for better visibility
 - Hover effect uses `brightness-110` only (no `scale` to prevent overflow)
+- Tooltip uses `top-full mt-2` positioning with arrow pointing up
 
 ### Type Definitions
 All types are in `src/types/api.ts`: PricePoint, HourlyPriceData, Appliance, OptimizedSchedule, UserPreferences, AppState, plus helper functions (formatPrice, getPriceCategory, etc.)

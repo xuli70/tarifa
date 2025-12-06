@@ -118,10 +118,10 @@ export function PriceChart({ prices, onHourSelect }: PriceChartProps) {
 
         {/* Línea de media */}
         <div
-          className="absolute left-0 right-0 border-t-2 border-dashed border-neutral-300 z-10 pointer-events-none"
+          className="absolute left-0 right-0 border-t-2 border-dashed border-neutral-800 z-30 pointer-events-none"
           style={{ bottom: `${averageLinePosition}%` }}
         >
-          <span className="absolute right-0 -top-5 text-caption text-neutral-500 bg-white/80 px-1.5 py-0.5 rounded">
+          <span className="absolute right-2 -top-6 text-xs sm:text-sm font-semibold text-neutral-900 bg-white px-2 py-1 rounded shadow-sm border border-neutral-200">
             Media: {formatPrice(stats.average)}€
           </span>
         </div>
