@@ -6,7 +6,7 @@ Aplicación web para optimizar el consumo eléctrico en España. Muestra los pre
 
 - **Acceso protegido**: PIN de 4 dígitos configurable para controlar el acceso
 - **Precios en tiempo real**: Obtiene precios horarios de la API oficial de REE
-- **Gráfico interactivo de precios**: Barras con degradados, alturas proporcionales, franjas horarias (madrugada, mañana, tarde, noche), tooltips y línea de media. Optimizado para móviles.
+- **Gráfico interactivo de precios**: Barras con degradados, alturas proporcionales, franjas horarias (madrugada, mañana, tarde, noche), tooltips y línea de media. Optimizado para móviles en vertical (24 barras visibles sin scroll).
 - **Clasificación de precios**: Barato (verde), Normal (ámbar), Caro (rojo)
 - **Top horas**: Muestra las 3 mejores y peores horas del día
 - **Planificador de electrodomésticos**: Programa tus aparatos en las horas más económicas

@@ -56,14 +56,16 @@ The main price visualization component (`src/components/dashboard/PriceChart.tsx
 - **Interactive tooltips**: Shows hour range, exact price (€/kWh), and category on hover/touch
 - **Average line**: Dashed horizontal line showing daily average price, centered in chart
 - **Current hour indicator**: Pulsing blue dot with ring highlight
-- **Hour labels**: Every 2 hours for better readability
+- **Hour labels**: Every 6 hours on mobile (0, 6, 12, 18), every 2 hours on desktop
 - **Touch support**: `onTouchStart`/`onTouchEnd` for mobile tooltip interaction
-- **Mobile optimized**: All 24 bars fit within container using `flex-1` distribution
+- **Mobile optimized**: All 24 bars fit within container in portrait mode
 
 **Important CSS notes**:
-- Bar containers must have `h-full justify-end` for percentage heights to work correctly
-- Chart container uses `overflow-hidden rounded-lg` to prevent bars from overflowing on mobile
-- Bars use `flex-1` without margins to maximize space efficiency on small screens
+- Bar containers use `flex-1 min-w-0` to allow compression without minimum width constraints
+- Chart container uses `overflow-hidden rounded-lg px-1` for internal padding and overflow prevention
+- Bars use `gap-px sm:gap-0.5` for minimal spacing (1px mobile, 2px desktop)
+- Mobile-specific styles: `rounded-t-sm`, `ring-1`, `text-[8px]` for smaller visual elements
+- Hover effect uses `brightness-110` only (no `scale` to prevent overflow)
 
 ### Type Definitions
 All types are in `src/types/api.ts`: PricePoint, HourlyPriceData, Appliance, OptimizedSchedule, UserPreferences, AppState, plus helper functions (formatPrice, getPriceCategory, etc.)

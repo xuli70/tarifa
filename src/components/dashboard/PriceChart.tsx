@@ -144,9 +144,13 @@ export function PriceChart({ prices, onHourSelect }: PriceChartProps) {
                 onTouchStart={() => setHoveredPrice(price)}
                 onTouchEnd={() => setHoveredPrice(null)}
               >
-                {/* Tooltip */}
+                {/* Tooltip - posicionado debajo de la barra */}
                 {isHovered && (
-                  <div className="absolute -top-20 left-1/2 transform -translate-x-1/2 z-30 animate-fade-in">
+                  <div className="absolute top-full mt-2 left-1/2 transform -translate-x-1/2 z-30 animate-fade-in">
+                    {/* Flecha del tooltip - arriba */}
+                    <div className="absolute left-1/2 transform -translate-x-1/2 -top-1.5">
+                      <div className="w-3 h-3 bg-neutral-900 transform rotate-45" />
+                    </div>
                     <div className="bg-neutral-900 text-white px-3 py-2 rounded-lg shadow-lg text-center whitespace-nowrap">
                       <p className="text-caption font-medium">
                         {formatHour(price.hour)} - {formatHour(price.hour + 1)}
@@ -162,10 +166,6 @@ export function PriceChart({ prices, onHourSelect }: PriceChartProps) {
                       )}>
                         {category.label}
                       </p>
-                    </div>
-                    {/* Flecha del tooltip */}
-                    <div className="absolute left-1/2 transform -translate-x-1/2 -bottom-1.5">
-                      <div className="w-3 h-3 bg-neutral-900 transform rotate-45" />
                     </div>
                   </div>
                 )}
@@ -193,11 +193,11 @@ export function PriceChart({ prices, onHourSelect }: PriceChartProps) {
                   )}
                 </div>
 
-                {/* Etiqueta de hora - cada 6 horas en móvil, cada 2 en desktop */}
+                {/* Etiqueta de hora - cada 3 horas en móvil, cada 2 en desktop */}
                 <span className={cn(
-                  'text-[8px] sm:text-caption mt-0.5 sm:mt-1.5 font-medium transition-colors',
-                  // Móvil: solo 0, 6, 12, 18. Desktop: cada 2 horas
-                  price.hour % 6 === 0 ? 'text-neutral-500' : 'text-transparent',
+                  'text-[10px] sm:text-caption mt-0.5 sm:mt-1.5 font-bold transition-colors',
+                  // Móvil: cada 3 horas (0, 3, 6, 9, 12, 15, 18, 21). Desktop: cada 2 horas
+                  price.hour % 3 === 0 ? 'text-neutral-600' : 'text-transparent',
                   price.hour % 2 === 0 && 'sm:text-neutral-500',
                   'group-hover:text-neutral-700'
                 )}>
